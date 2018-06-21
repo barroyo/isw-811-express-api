@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-function userParams(body){
+function userParams(body, user){
     // strong parameters
     var allowedAttributes = ['lastName', 'username', 'password', 'firstName'];
     Object.keys(body).forEach((key) => {
@@ -18,6 +18,7 @@ function userParams(body){
             user[key] = body[key];
         }
     });
+    return user;
 }
 // users endpoints
 
@@ -34,11 +35,8 @@ app.get('/api/users', (req, res) => {
 app.post('/api/users', (req, res) => {
     var user = new User();
     
-    user.firstName = req.body.firstName;
-    user.lastName = req.body.lastName;
-    user.username = req.body.username;
-    user.password = req.body.password;
-
+    user = userParams(req.body, user);
+    
     user.save(function(err){
         if(err) {
             res.status(422);
@@ -59,7 +57,7 @@ app.patch('/api/users', (req, res) => {
         res.json({error: 'User not found'});
     }
 
-    
+    user = userParams(req.body, user);
     // execute the update
     User.findByIdAndUpdate(userId, user, {new: true}, (err, updatedUser) => {
         if(err) {
