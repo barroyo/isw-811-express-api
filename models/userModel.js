@@ -8,4 +8,7 @@ const user = new Schema({
     password: { type: String }
 });
 
-module.exports = mongoose.model('users', user);
+const allowedAttributes = ['lastName', 'username', 'password', 'firstName'];
+
+module.exports.User = mongoose.model('users', user);
+module.exports.UserAllowedAttributes = allowedAttributes;
