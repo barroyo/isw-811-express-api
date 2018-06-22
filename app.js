@@ -3,11 +3,21 @@ const mongoose = require('mongoose');
 const db = mongoose.connect('mongodb://127.0.0.1:27017/auth-api');
 const { User, UserAllowedAttributes }  = require('./models/userModel');
 const app = express();
-
 const bodyParser = require('body-parser');
+
+const PORT = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+/**
+ * Gets this server host URL
+ * 
+ * @param {*} req 
+ */
+function getHostUrl(req){
+    return req.protocol + '://' + req.get('host') + req.originalUrl;
+}
 
 /**
  * Strong params function for User payloads
@@ -61,7 +71,7 @@ app.post('/api/users', (req, res) => {
             handleError(res, err, 422);
         }
         res.status(201);
-        res.setHeader('location',`http://localhost:3000/api/users/?id=${user._id}`);
+        res.setHeader('location',`${getHostUrl(req)}?id=${user._id}`);
         res.json(user);
     });
 });
@@ -94,4 +104,4 @@ app.use(function(req, res, next){
 });
 
 
-app.listen(3000, () => console.log('Auth API is listening on port 3000!'));
+app.listen(PORT, () => console.log('Auth API is listening on port 3000!'));
